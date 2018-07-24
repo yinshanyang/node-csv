@@ -1,12 +1,21 @@
 const fs = require('fs')
-const { csvParse, csvParseRows, csvFormat, csvFormatRows } = require('d3-dsv')
+const { dsvFormat } = require('d3-dsv')
 
-const parse = (path) => csvParse(fs.readFileSync(path, 'utf8'))
+const dsv = (sep) => {
+  const dsv = dsvFormat(sep)
 
-const parseRows = (path) => csvParseRows(fs.readFileSync(path, 'utf8'))
+  const parse = (path) => dsv.parse(fs.readFileSync(path, 'utf8'))
+  const parseRows = (path) => dsv.parseRows(fs.readFileSync(path, 'utf8'))
+  const format = (path, data) => fs.writeFileSync(path, dsv.format(data))
+  const formatRows = (path, data) => fs.writeFileSync(path, dsv.formatRows(data))
 
-const format = (path, data) => fs.writeFileSync(path, csvFormat(data))
+  return { parse, parseRows, format, formatRows }
+}
 
-const formatRows = (path, data) => fs.writeFileSync(path, csvFormatRows(data))
+const csv = dsvFormat(',')
+const parse = (path) => csv.parse(fs.readFileSync(path, 'utf8'))
+const parseRows = (path) => csv.parseRows(fs.readFileSync(path, 'utf8'))
+const format = (path, data) => fs.writeFileSync(path, csv.format(data))
+const formatRows = (path, data) => fs.writeFileSync(path, csv.formatRows(data))
 
-module.exports = { parse, parseRows, format, formatRows }
+module.exports = { dsv, parse, parseRows, format, formatRows }
